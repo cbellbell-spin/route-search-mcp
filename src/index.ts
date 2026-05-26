@@ -9,7 +9,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { RideWithGPSApi, RideWithGPSConfig, RideWithGPSApiError } from "./api.js";
+import { RideWithGPSApi, RideWithGPSConfig, RideWithGPSApiError, RouteDetails, TrackPoint } from "./api.js";
 
 // Constants
 const SERVER_NAME = "route-search-mcp";
@@ -194,21 +194,20 @@ server.registerTool(
       const totalGain = route.elevation_gain ?? 0;
       const totalLoss = route.elevation_loss ?? 0;
 
-      // Extract elevation from track points
-      let trackPointsWithElevation: { lat: number; lng: number; ele: number }[] = [];
+      // RWGPS track_points use x=lng, y=lat, e=elevation
+      let trackPointsWithElevation: TrackPoint[] = [];
       if (route.track_points && route.track_points.length > 0) {
         trackPointsWithElevation = route.track_points
-          .filter((p: { lat?: number; lng?: number; ele?: number }) => p.lat !== undefined && p.lng !== undefined && p.ele !== undefined)
-          .map((p: { lat?: number; lng?: number; ele?: number }) => ({ lat: p.lat!, lng: p.lng!, ele: p.ele! }));
+          .filter((p: TrackPoint) => p.x !== undefined && p.y !== undefined && p.e !== undefined);
       }
 
       // Compute min/max elevation
       let minElevation = 0;
       let maxElevation = 0;
       if (trackPointsWithElevation.length > 0) {
-        const elevations = trackPointsWithElevation.map(p => p.ele);
-        minElevation = Math.min(...elevations);
-        maxElevation = Math.max(...elevations);
+        const elevations = trackPointsWithElevation.map(p => p.e);
+        minElevation = Math.round(Math.min(...elevations));
+        maxElevation = Math.round(Math.max(...elevations));
       }
 
       // Sample elevation array to max 100 points
@@ -218,7 +217,7 @@ server.registerTool(
         elevationArray = trackPointsWithElevation
           .filter((_, idx) => idx % step === 0)
           .slice(0, 100)
-          .map(p => Math.round(p.ele));
+          .map(p => Math.round(p.e));
       }
 
       const profileData = {

@@ -145,8 +145,10 @@ export interface RouteDetails extends RouteSummary {
 }
 
 export interface TrackPoint {
-  lat: number;
-  lng: number;
-  ele?: number;
-  t?: number;
+  x: number;  // longitude
+  y: number;  // latitude
+  e: number;  // elevation
+  d?: number; // distance
+  S?: number; // speed
+  R?: number; // heart rate
 }
