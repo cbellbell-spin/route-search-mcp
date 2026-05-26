@@ -1,0 +1,29 @@
+{
+  "name": "route-search-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for searching and analyzing cycling routes with RideWithGPS",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "ridewithgps",
+    "cycling",
+    "routes",
+    "gps"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.17.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "5.8.3"
+  }
+}
